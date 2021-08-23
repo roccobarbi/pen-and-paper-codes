@@ -12,15 +12,6 @@ type config struct {
 	Input string
 }
 
-/*
-Usage:
-	caesar_encrypt {key} -t {text}
-	caesar_encrypt {key} -f {text file}
-*/
-func main() {
-	configuration, err := validateConfig(os.Args)
-}
-
 func validateConfig(args []string) (config, error) {
 	var configuration config
 	if len(args) != 4 {
@@ -38,4 +29,13 @@ func validateConfig(args []string) (config, error) {
 	}
 	configuration.Input = args[3]
 	return configuration, nil
+}
+
+/*
+Usage:
+	caesar_encrypt {key} -t {text}
+	caesar_encrypt {key} -f {text file}
+*/
+func main() {
+	configuration, err := validateConfig(os.Args)
 }
