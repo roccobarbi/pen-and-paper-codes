@@ -7,13 +7,37 @@ import (
 )
 
 type config struct {
-	Key   byte
-	Mode  byte
-	Input string
+	IsPlainKeySet  bool
+	PlainKey       string
+	IsCypherKeySet bool
+	CypherKey      string
+	IsKeyModeSet   bool
+	KeyMode        byte
+	IsOffsetSet    bool
+	Offset         byte
+	Input          string
 }
 
+func (c *config) init() {
+	c.IsPlainKeySet = false
+	c.PlainKey = ""
+	c.IsCypherKeySet = false
+	c.CypherKey = ""
+	c.IsKeyModeSet = false
+	c.KeyMode = 0
+	c.IsOffsetSet = false
+	c.Offset = 0
+	c.Input = ""
+}
+
+/**
+validateConfig parses the command line arguments and returns a configuration structure. The command line arguments are
+not read directly, but rather received as validateConfig's only argument (a string slice). validateConfig returns a
+tuple with the config structure and an error object (or nil).
+*/
 func validateConfig(args []string) (config, error) {
 	var configuration config
+	configuration.init()
 	if len(args) != 4 {
 		return configuration, errors.New("Wrong number of arguments: expected 3, got " + strconv.Itoa(len(args)))
 	}
