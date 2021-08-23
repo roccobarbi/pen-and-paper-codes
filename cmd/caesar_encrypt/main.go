@@ -30,6 +30,34 @@ func (c *config) init() {
 	c.Input = ""
 }
 
+/*
+ingestArgs transforms an array of arguments into a slice of string slices. Each element of the external slice is made of
+a first element that represents the flag's name (without leading -), followed by any additional string found before the
+next argument.
+
+Long-form "--" arguments or trailing elements that are not preceded by a flag are not supported (neither are they
+needed) at this time.
+*/
+func ingestArgs(args []string) [][]string {
+	var parsedArgs [][]string
+	var argGroup []string
+	for _, arg := range args {
+		if arg[0] == '-' {
+			// This argument defines a new option
+			if len(argGroup) > 0 {
+				// Some argument was being parsed already, it can be closed
+				parsedArgs = append(parsedArgs, argGroup)
+				argGroup = []string{}
+			}
+			argGroup = append(argGroup, arg[1:])
+		} else {
+			argGroup = append(argGroup, arg)
+		}
+	}
+	parsedArgs = append(parsedArgs, argGroup) // append the last arg to be parsed
+	return parsedArgs
+}
+
 /**
 validateConfig parses the command line arguments and returns a configuration structure. The command line arguments are
 not read directly, but rather received as validateConfig's only argument (a string slice). validateConfig returns a
@@ -38,20 +66,7 @@ tuple with the config structure and an error object (or nil).
 func validateConfig(args []string) (config, error) {
 	var configuration config
 	configuration.init()
-	if len(args) != 4 {
-		return configuration, errors.New("Wrong number of arguments: expected 3, got " + strconv.Itoa(len(args)))
-	}
-	if len(args[1]) != 1 {
-		return configuration, errors.New("Wrong length of key: expected 1, got " + strconv.Itoa(len(args[1])))
-	} else {
-		configuration.Key = args[1][0]
-	}
-	if len(args[2]) != 2 || args[2][1] != '-' || (args[2][2] != 'f' && args[2][2] != 't') {
-		return configuration, errors.New("Invalid mode or bad mode formatting: expected -f or -t, got " + strconv.Itoa(len(args[1])))
-	} else {
-		configuration.Mode = args[2][0]
-	}
-	configuration.Input = args[3]
+	parsedArgs := ingestArgs(args)
 	return configuration, nil
 }
 
