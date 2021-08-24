@@ -31,7 +31,7 @@ func StripDuplicateCharacters(input string) string {
 	output := ""
 	var used map[rune]bool
 	for _, c := range input {
-		if !used[c] {
+		if _, inUse := used[c]; !inUse {
 			output = output + string(c)
 			used[c] = true
 		}
