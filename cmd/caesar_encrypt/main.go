@@ -11,8 +11,6 @@ type config struct {
 	PlainKey       string
 	IsCypherKeySet bool
 	CypherKey      string
-	IsKeyModeSet   bool
-	KeyMode        byte
 	IsOffsetSet    bool
 	Offset         byte
 	Input          string
@@ -23,8 +21,6 @@ func (c *config) init() {
 	c.PlainKey = ""
 	c.IsCypherKeySet = false
 	c.CypherKey = ""
-	c.IsKeyModeSet = false
-	c.KeyMode = 0
 	c.IsOffsetSet = false
 	c.Offset = 0
 	c.Input = ""
