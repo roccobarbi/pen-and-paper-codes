@@ -56,7 +56,7 @@ func ingestArgs(args []string) [][]string {
 
 func validateFlagF(configuration config, arg []string) (config, error) {
 	if len(arg) != 2 {
-		return configuration, errors.New("-f option used without a filename.")
+		return configuration, errors.New("-f option used without a filename")
 	}
 	configuration.Input = arg[2]
 	return configuration, nil
@@ -64,7 +64,7 @@ func validateFlagF(configuration config, arg []string) (config, error) {
 
 func validateFlagC(configuration config, arg []string) (config, error) {
 	if len(arg) != 2 {
-		return configuration, errors.New("-c option used without a key.")
+		return configuration, errors.New("-c option used without a key")
 	}
 	if !utils.IsAlphabeticString(arg[2]) {
 		return configuration, errors.New("-c key uses non-alphabetic characters")
@@ -76,7 +76,7 @@ func validateFlagC(configuration config, arg []string) (config, error) {
 
 func validateFlagP(configuration config, arg []string) (config, error) {
 	if len(arg) != 2 {
-		return configuration, errors.New("-p option used without a key.")
+		return configuration, errors.New("-p option used without a key")
 	}
 	if !utils.IsAlphabeticString(arg[2]) {
 		return configuration, errors.New("-p key uses non-alphabetic characters")
@@ -87,7 +87,7 @@ func validateFlagP(configuration config, arg []string) (config, error) {
 }
 
 func validateFlagO(configuration config, arg []string) (config, error) {
-	return configuration, errors.New("Not implemented.")
+	return configuration, errors.New("not implemented")
 }
 
 /**
@@ -142,7 +142,7 @@ If the combination of keys/offset causes a plaintext letter to be represented by
 returned as the code would be much easier to break.
 */
 func createCypher(configuration config) (map[byte]byte, error) {
-	return nil, errors.New("Not implemented.")
+	return nil, errors.New("not implemented")
 }
 
 /*
