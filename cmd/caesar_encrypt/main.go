@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"os"
-	"strconv"
 )
 
 type config struct {
@@ -24,6 +23,13 @@ func (c *config) init() {
 	c.IsOffsetSet = false
 	c.Offset = 0
 	c.Input = ""
+}
+
+func exitIfError(err error) {
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
+	}
 }
 
 /*
@@ -110,10 +116,41 @@ func validateConfig(args []string) (config, error) {
 }
 
 /*
+createCypher builds a map between the plaintext alphabet and the cyphertext's alphabet. Since a caesar's cypher is a
+simple substitution cypher, that's all we need to encrypt the plaintext.
+This version of the caesar cypher incorporates the (optional) features of aristocrats used by the American Cryptogram
+Association, together with an (optional) offset that works like the original caesar cypher. At least one encryption
+method must be set or an error will be returned:
+- offset, the cyphertext is shifted by n characters to the right (e.g. with offset 3 the plaintext A is encrypted as D);
+- plainKey, the key is written (if there are duplicate letters, only their first instance is kept, so that e.g. the key
+  "sassy" is rendered as "say"), then the rest of the plaintext alphabet is written;
+- cypherkey, the key is written (if there are duplicate letters, only their first instance is kept, so that e.g. the key
+  "sassy" is rendered as "say"), then the rest of the cyphertext alphabet is written.
+The 2 keys may or may not be equal, and they may or may not be present. If both a cypherkey and an offset are present,
+the offset will be applied after writing the key, to the remaining letters of the cypher's alphabet.
+If the combination of keys/offset causes a plaintext letter to be represented by itself in the cyphertext, an error is
+returned as the code would be much easier to break.
+*/
+func createCypher(configuration config) (map[byte]byte, error) {
+	return nil, errors.New("Not implemented.")
+}
+
+/*
+encrypt encrypts the plaintext, displaying it on screen and saving it in the plaintext's location using the .caesar
+file extension
+*/
+func encrypt(configuration config, cypher map[byte]byte) {
+}
+
+/*
 Usage:
 	caesar_encrypt {key} -t {text}
 	caesar_encrypt {key} -f {text file}
 */
 func main() {
 	configuration, err := validateConfig(os.Args)
+	exitIfError(err)
+	cypher, err := createCypher(configuration)
+	exitIfError(err)
+	encrypt(configuration, cypher)
 }
