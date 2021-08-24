@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"pen-and-paper-codes/utils"
+	"strconv"
 )
 
 type config struct {
@@ -24,6 +25,11 @@ func (c *config) init() {
 	c.IsOffsetSet = false
 	c.Offset = 0
 	c.Input = ""
+}
+
+func (c *config) setOffset(offset byte) {
+	c.IsOffsetSet = true
+	c.Offset = offset
 }
 
 /*
@@ -87,6 +93,26 @@ func validateFlagP(configuration config, arg []string) (config, error) {
 }
 
 func validateFlagO(configuration config, arg []string) (config, error) {
+	if len(arg) != 2 {
+		return configuration, errors.New("-o option used without an offset")
+	}
+	if utils.IsAlphabeticString(arg[2]) {
+		if len(arg[2]) != 1 {
+			return configuration, errors.New("invalid offset: if a character is used, it must be exactly one character")
+		}
+		configuration.setOffset(arg[2][0])
+	} else if utils.IsIntegerString(arg[2]) {
+		offset, err := strconv.Atoi(arg[2])
+		if err != nil {
+			return configuration, errors.New("could not convert integrer offset to int")
+		}
+		if offset < 0 || offset > 26 {
+			return configuration, errors.New("integer offset out of range, must be between 0 and 26")
+		}
+		configuration.setOffset(byte(offset))
+	} else {
+		return configuration, errors.New("invalid offset: it must be either a character or an integer between 0 and 26")
+	}
 	return configuration, errors.New("not implemented")
 }
 
