@@ -27,6 +27,16 @@ func (c *config) init() {
 	c.Input = ""
 }
 
+func (c *config) setPlainKey(key string) {
+	c.IsPlainKeySet = true
+	c.PlainKey = key
+}
+
+func (c *config) setCypherKey(key string) {
+	c.IsCypherKeySet = true
+	c.CypherKey = key
+}
+
 func (c *config) setOffset(offset byte) {
 	c.IsOffsetSet = true
 	c.Offset = offset
@@ -75,8 +85,7 @@ func validateFlagC(configuration config, arg []string) (config, error) {
 	if !utils.IsAlphabeticString(arg[2]) {
 		return configuration, errors.New("-c key uses non-alphabetic characters")
 	}
-	configuration.CypherKey = arg[2]
-	configuration.IsCypherKeySet = true
+	configuration.setCypherKey(arg[2])
 	return configuration, nil
 }
 
@@ -87,8 +96,7 @@ func validateFlagP(configuration config, arg []string) (config, error) {
 	if !utils.IsAlphabeticString(arg[2]) {
 		return configuration, errors.New("-p key uses non-alphabetic characters")
 	}
-	configuration.PlainKey = arg[2]
-	configuration.IsPlainKeySet = true
+	configuration.setPlainKey(arg[2])
 	return configuration, nil
 }
 
