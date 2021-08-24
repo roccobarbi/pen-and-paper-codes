@@ -33,6 +33,7 @@ func StripDuplicateCharacters(input string) string {
 	for _, c := range input {
 		if !used[c] {
 			output = output + string(c)
+			used[c] = true
 		}
 	}
 	return output
