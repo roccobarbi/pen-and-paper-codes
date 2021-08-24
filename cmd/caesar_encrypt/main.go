@@ -86,10 +86,6 @@ func validateFlagP(configuration config, arg []string) (config, error) {
 	return configuration, nil
 }
 
-func validateFlagM(configuration config, arg []string) (config, error) {
-	return configuration, errors.New("Not implemented.")
-}
-
 func validateFlagO(configuration config, arg []string) (config, error) {
 	return configuration, errors.New("Not implemented.")
 }
@@ -117,10 +113,10 @@ func validateConfig(args []string) (config, error) {
 			configuration, err = validateFlagC(configuration, arg)
 		case "p":
 			configuration, err = validateFlagP(configuration, arg)
-		case "m":
-			configuration, err = validateFlagM(configuration, arg)
 		case "o":
 			configuration, err = validateFlagO(configuration, arg)
+		default:
+			err = errors.New("Unknown option: " + arg[0])
 		}
 		if err != nil {
 			return configuration, err
