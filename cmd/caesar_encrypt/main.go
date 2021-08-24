@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"os"
+	"pen-and-paper-codes/utils"
 )
 
 type config struct {
@@ -23,13 +24,6 @@ func (c *config) init() {
 	c.IsOffsetSet = false
 	c.Offset = 0
 	c.Input = ""
-}
-
-func exitIfError(err error) {
-	if err != nil {
-		println(err.Error())
-		os.Exit(1)
-	}
 }
 
 /*
@@ -61,15 +55,35 @@ func ingestArgs(args []string) [][]string {
 }
 
 func validateFlagF(configuration config, arg []string) (config, error) {
-	return configuration, errors.New("Not implemented.")
+	if len(arg) != 2 {
+		return configuration, errors.New("-f option used without a filename.")
+	}
+	configuration.Input = arg[2]
+	return configuration, nil
 }
 
 func validateFlagC(configuration config, arg []string) (config, error) {
-	return configuration, errors.New("Not implemented.")
+	if len(arg) != 2 {
+		return configuration, errors.New("-c option used without a key.")
+	}
+	if !utils.IsAlphabeticString(arg[2]) {
+		return configuration, errors.New("-c key uses non-alphabetic characters")
+	}
+	configuration.CypherKey = arg[2]
+	configuration.IsCypherKeySet = true
+	return configuration, nil
 }
 
 func validateFlagP(configuration config, arg []string) (config, error) {
-	return configuration, errors.New("Not implemented.")
+	if len(arg) != 2 {
+		return configuration, errors.New("-p option used without a key.")
+	}
+	if !utils.IsAlphabeticString(arg[2]) {
+		return configuration, errors.New("-p key uses non-alphabetic characters")
+	}
+	configuration.PlainKey = arg[2]
+	configuration.IsPlainKeySet = true
+	return configuration, nil
 }
 
 func validateFlagM(configuration config, arg []string) (config, error) {
@@ -149,8 +163,8 @@ Usage:
 */
 func main() {
 	configuration, err := validateConfig(os.Args)
-	exitIfError(err)
+	utils.ExitIfError(err)
 	cypher, err := createCypher(configuration)
-	exitIfError(err)
+	utils.ExitIfError(err)
 	encrypt(configuration, cypher)
 }
