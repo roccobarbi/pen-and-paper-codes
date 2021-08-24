@@ -5,6 +5,7 @@ import (
 	"os"
 	"pen-and-paper-codes/utils"
 	"strconv"
+	"strings"
 )
 
 type config struct {
@@ -85,7 +86,7 @@ func validateFlagC(configuration config, arg []string) (config, error) {
 	if !utils.IsAlphabeticString(arg[2]) {
 		return configuration, errors.New("-c key uses non-alphabetic characters")
 	}
-	configuration.setCypherKey(arg[2])
+	configuration.setCypherKey(strings.ToLower(arg[2])) // all lowercase
 	return configuration, nil
 }
 
@@ -96,7 +97,7 @@ func validateFlagP(configuration config, arg []string) (config, error) {
 	if !utils.IsAlphabeticString(arg[2]) {
 		return configuration, errors.New("-p key uses non-alphabetic characters")
 	}
-	configuration.setPlainKey(arg[2])
+	configuration.setPlainKey(strings.ToLower(arg[2])) // all lowercase
 	return configuration, nil
 }
 
@@ -108,18 +109,18 @@ func validateFlagO(configuration config, arg []string) (config, error) {
 		if len(arg[2]) != 1 {
 			return configuration, errors.New("invalid offset: if a character is used, it must be exactly one character")
 		}
-		configuration.setOffset(arg[2][0])
+		configuration.setOffset(strings.ToLower(arg[2])[0] - 'a') // the offset is a number between 0 and 25
 	} else if utils.IsIntegerString(arg[2]) {
 		offset, err := strconv.Atoi(arg[2])
 		if err != nil {
 			return configuration, errors.New("could not convert integrer offset to int")
 		}
-		if offset < 0 || offset > 26 {
-			return configuration, errors.New("integer offset out of range, must be between 0 and 26")
+		if offset < 0 || offset > 25 {
+			return configuration, errors.New("integer offset out of range, must be between 0 and 25")
 		}
 		configuration.setOffset(byte(offset))
 	} else {
-		return configuration, errors.New("invalid offset: it must be either a character or an integer between 0 and 26")
+		return configuration, errors.New("invalid offset: it must be either a character or an integer between 0 and 25")
 	}
 	return configuration, errors.New("not implemented")
 }
@@ -159,6 +160,54 @@ func validateConfig(args []string) (config, error) {
 	return configuration, nil
 }
 
+func setPlainAlphabet(configuration config) []rune {
+	var plainAlphabet []rune
+	var used map[rune]bool
+	var alphabet = "abcdefghijklmnopqrstuvwxyz"
+	if configuration.IsPlainKeySet {
+		key := utils.StripDuplicateCharacters(configuration.PlainKey)
+		for _, letter := range key {
+			if _, inUse := used[letter]; !inUse {
+				plainAlphabet = append(plainAlphabet, letter)
+				used[letter] = true
+			}
+		}
+	}
+	for _, letter := range alphabet {
+		if _, inUse := used[letter]; !inUse {
+			plainAlphabet = append(plainAlphabet, letter)
+			used[letter] = true
+		}
+	}
+	return plainAlphabet
+}
+
+func setCypherAlphabet(configuration config) []rune {
+	var cypherAlphabet []rune
+	var used map[rune]bool
+	var alphabet = "abcdefghijklmnopqrstuvwxyz"
+	if configuration.IsOffsetSet {
+		// start with the overflowed letter
+		// add all other letters
+	}
+	if configuration.IsCypherKeySet {
+		key := utils.StripDuplicateCharacters(configuration.CypherKey)
+		for _, letter := range key {
+			if _, inUse := used[letter]; !inUse {
+				cypherAlphabet = append(cypherAlphabet, letter)
+				used[letter] = true
+			}
+		}
+	}
+	for _, letter := range alphabet {
+		if _, inUse := used[letter]; !inUse {
+			cypherAlphabet = append(cypherAlphabet, letter)
+			used[letter] = true
+		}
+	}
+	return cypherAlphabet
+}
+
 /*
 createCypher builds a map between the plaintext alphabet and the cyphertext's alphabet. Since a caesar's cypher is a
 simple substitution cypher, that's all we need to encrypt the plaintext.
@@ -175,15 +224,24 @@ the offset will be applied after writing the key, to the remaining letters of th
 If the combination of keys/offset causes a plaintext letter to be represented by itself in the cyphertext, an error is
 returned as the code would be much easier to break.
 */
-func createCypher(configuration config) (map[byte]byte, error) {
-	return nil, errors.New("not implemented")
+func createCypher(configuration config) (map[rune]rune, error) {
+	var cypher map[rune]rune
+	if !configuration.IsPlainKeySet && !configuration.IsCypherKeySet && !configuration.IsOffsetSet {
+		return nil, errors.New("no key or offset has been set")
+	}
+	plainAlphabet := setPlainAlphabet(configuration)
+	cypherAlphabet := setCypherAlphabet(configuration)
+	for i, l := range plainAlphabet {
+		cypher[l] = cypherAlphabet[i]
+	}
+	return cypher, nil
 }
 
 /*
 encrypt encrypts the plaintext, displaying it on screen and saving it in the plaintext's location using the .caesar
 file extension
 */
-func encrypt(configuration config, cypher map[byte]byte) {
+func encrypt(configuration config, cypher map[rune]rune) {
 }
 
 /*
