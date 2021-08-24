@@ -26,3 +26,14 @@ func ExitIfError(err error) {
 		os.Exit(1)
 	}
 }
+
+func StripDuplicateCharacters(input string) string {
+	output := ""
+	var used map[rune]bool
+	for _, c := range input {
+		if !used[c] {
+			output = output + string(c)
+		}
+	}
+	return output
+}
